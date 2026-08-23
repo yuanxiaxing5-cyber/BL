@@ -1,0 +1,138 @@
+name: Upload CI Build to Release
+
+on:
+  release:
+    types: ["published"]
+
+jobs:
+  upload-ci-build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: read
+
+    env:
+      GH_TOKEN: ${{ secrets.PAT }}
+      REPO: ${{ github.repository }}
+
+    steps:
+      - name: Check if release already has zip asset
+        id: check
+        run: |
+          set -euo pipefail
+          RELEASE_ID="${{ github.event.release.id }}"
+          TAG_NAME="${{ github.event.release.tag_name }}"
+          echo "tag_name=$TAG_NAME" >> "$GITHUB_OUTPUT"
+          echo "release_id=$RELEASE_ID" >> "$GITHUB_OUTPUT"
+
+          EXISTING=$(gh api "repos/$REPO/releases/$RELEASE_ID" \
+            | jq -r '.assets[]? | select(.name | endswith(".zip")) | .name' | head -1)
+
+          if [ -n "$EXISTING" ]; then
+            echo "Release already has zip asset: $EXISTING, skipping upload."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "No zip asset found, will upload latest CI build."
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Find and wait for CI build
+        if: steps.check.outputs.skip == 'false'
+        id: ci
+        run: |
+          set -euo pipefail
+          TAG_NAME="${{ steps.check.outputs.tag_name }}"
+          RUN_ID=""
+
+          # First, look for an already-completed successful build
+          RUN_ID=$(gh api "repos/$REPO/actions/runs?branch=$TAG_NAME&status=success&per_page=10" \
+            | jq -r '.workflow_runs[]? | select(.name == "Build OhMyKeymint") | .id' | head -1)
+
+          if [ -n "$RUN_ID" ]; then
+            echo "Found successful CI build: $RUN_ID"
+          else
+            # Look for in-progress build and wait for it
+            RUN_ID=$(gh api "repos/$REPO/actions/runs?branch=$TAG_NAME&status=in_progress&per_page=10" \
+              | jq -r '.workflow_runs[]? | select(.name == "Build OhMyKeymint") | .id' | head -1)
+
+            if [ -z "$RUN_ID" ]; then
+              # Also check queued / pending
+              RUN_ID=$(gh api "repos/$REPO/actions/runs?branch=$TAG_NAME&per_page=10" \
+                | jq -r '.workflow_runs[]? | select(.name == "Build OhMyKeymint" and (.status == "queued" or .status == "pending" or .status == "in_progress")) | .id' | head -1)
+            fi
+
+            if [ -z "$RUN_ID" ]; then
+              echo "::error::No CI build found for tag $TAG_NAME. Make sure the tag push triggered a build."
+              exit 1
+            fi
+
+            echo "Waiting for CI build $RUN_ID to complete..."
+            for attempt in $(seq 1 120); do
+              STATUS=$(gh api "repos/$REPO/actions/runs/$RUN_ID" | jq -r '.status')
+              if [ "$STATUS" = "completed" ]; then
+                CONCLUSION=$(gh api "repos/$REPO/actions/runs/$RUN_ID" | jq -r '.conclusion')
+                if [ "$CONCLUSION" = "success" ]; then
+                  echo "CI build completed successfully."
+                  break
+                else
+                  echo "::error::CI build failed with conclusion: $CONCLUSION"
+                  exit 1
+                fi
+              fi
+              echo "Build status: $STATUS (attempt $attempt/120)..."
+              sleep 10
+            done
+          fi
+
+          echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
+
+      - name: Download and repackage artifact
+        if: steps.check.outputs.skip == 'false'
+        id: pkg
+        run: |
+          set -euo pipefail
+          RUN_ID="${{ steps.ci.outputs.run_id }}"
+
+          # Find the release artifact (not debug, not boringssl)
+          ARTIFACT_ID=$(gh api "repos/$REPO/actions/runs/$RUN_ID/artifacts" \
+            | jq -r '.artifacts[]? | select(.name | contains("release")) | .id' | head -1)
+
+          if [ -z "$ARTIFACT_ID" ]; then
+            echo "::error::No release artifact found in CI build $RUN_ID"
+            exit 1
+          fi
+
+          echo "Downloading release artifact $ARTIFACT_ID..."
+          gh api "repos/$REPO/actions/artifacts/$ARTIFACT_ID/zip" > artifact.zip
+
+          mkdir -p module
+          cd module
+          unzip -q ../artifact.zip
+
+          # Read version info from module.prop
+          VERSION=$(grep '^version=' module.prop | cut -d= -f2)
+          VERSION_CODE=$(grep '^versionCode=' module.prop | cut -d= -f2)
+          echo "Module version: $VERSION (versionCode: $VERSION_CODE)"
+
+          # Repackage without .sha256 hash files
+          ZIP_NAME="安卓设备隐藏bl-release-arm64-v8a-${VERSION}.zip"
+          zip -q -r "../$ZIP_NAME" . -x "*.sha256"
+          cd ..
+
+          echo "zip_name=$ZIP_NAME" >> "$GITHUB_OUTPUT"
+          echo "Created: $ZIP_NAME ($(du -h "$ZIP_NAME" | cut -f1))"
+
+      - name: Upload to release
+        if: steps.check.outputs.skip == 'false'
+        run: |
+          set -euo pipefail
+          TAG_NAME="${{ steps.check.outputs.tag_name }}"
+          ZIP_NAME="${{ steps.pkg.outputs.zip_name }}"
+
+          echo "Uploading $ZIP_NAME to release $TAG_NAME..."
+          gh release upload "$TAG_NAME" "$ZIP_NAME" --clobber
+          echo "Upload complete!"
+
+          echo ""
+          echo "=== Release assets ==="
+          gh release view "$TAG_NAME" --json assets --jq '.assets[] | "- \(.name) (\(.size) bytes)"'
