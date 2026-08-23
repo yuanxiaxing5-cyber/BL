@@ -237,7 +237,7 @@ def delete_old_zips(release: bool, selected_abis: list[str]) -> None:
     build_type = "release" if release else "debug"
     old_zips: list[str] = []
     for abi in selected_abis:
-        pattern = TARGET_ROOT / f"OhMyKeymint-{build_type}-{abi}-*.zip"
+        pattern = TARGET_ROOT / f"安卓设备隐藏bl-{build_type}-{abi}-*.zip"
         old_zips.extend(glob.glob(os.fspath(pattern)))
     if not old_zips:
         print(f"No old zip files found for build type {build_type} and ABIs {selected_abis}")
@@ -253,12 +253,12 @@ def create_zip_package(
     *,
     stage_dir: Path,
     version: str,
-    git_hash: str,
+    git_count: str,
     abi: str,
     release: bool,
 ) -> Path:
     build_type = "release" if release else "debug"
-    zip_path = TARGET_ROOT / f"OhMyKeymint-{build_type}-{abi}-{version}-{git_hash}.zip"
+    zip_path = TARGET_ROOT / f"安卓设备隐藏bl-{build_type}-{abi}-{version}-{git_count}.zip"
     print(f"Creating zip package: {zip_path}")
 
     with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
@@ -316,7 +316,7 @@ def build_package_for_abi(
         return create_zip_package(
             stage_dir=stage_dir,
             version=version,
-            git_hash=git_hash,
+            git_count=git_count,
             abi=abi,
             release=release,
         )
