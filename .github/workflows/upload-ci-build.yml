@@ -130,9 +130,9 @@ jobs:
           ZIP_NAME="${{ steps.pkg.outputs.zip_name }}"
 
           echo "Uploading $ZIP_NAME to release $TAG_NAME..."
-          gh release upload "$TAG_NAME" "$ZIP_NAME" --clobber
+          gh release upload "$TAG_NAME" "$ZIP_NAME" --clobber --repo "$REPO"
           echo "Upload complete!"
 
           echo ""
           echo "=== Release assets ==="
-          gh release view "$TAG_NAME" --json assets --jq '.assets[] | "- \(.name) (\(.size) bytes)"'
+          gh release view "$TAG_NAME" --repo "$REPO" --json assets --jq '.assets[] | "- \(.name) (\(.size) bytes)"'
