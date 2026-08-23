@@ -67,7 +67,7 @@ jobs:
             fi
 
             echo "Waiting for CI build $RUN_ID to complete..."
-            for attempt in $(seq 1 120); do
+            for attempt in $(seq 1 60); do
               STATUS=$(gh api "repos/$REPO/actions/runs/$RUN_ID" | jq -r '.status')
               if [ "$STATUS" = "completed" ]; then
                 CONCLUSION=$(gh api "repos/$REPO/actions/runs/$RUN_ID" | jq -r '.conclusion')
@@ -79,7 +79,7 @@ jobs:
                   exit 1
                 fi
               fi
-              echo "Build status: $STATUS (attempt $attempt/120)..."
+              echo "Build status: $STATUS (attempt $attempt/60)..."
               sleep 10
             done
           fi

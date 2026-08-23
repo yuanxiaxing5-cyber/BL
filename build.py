@@ -45,6 +45,7 @@ BINARY_SPECS = (
 )
 
 REQUIRED_TEMPLATE_FILES = (
+    "action.sh",
     "customize.sh",
     "daemon",
     "daemon-injector",
@@ -58,6 +59,7 @@ REQUIRED_TEMPLATE_FILES = (
 MODULE_TEXT_FILES = (
     "AOSP.Apache-license-2.0.txt",
     "README.md",
+    "action.sh",
     "customize.sh",
     "daemon",
     "daemon-injector",
@@ -99,18 +101,6 @@ def get_git_commit_count() -> str:
     if not git_count.isdigit():
         raise ValueError(f"Git commit count must be numeric only, got: {git_count}")
     return git_count
-
-
-def get_git_commit_hash() -> str:
-    result = subprocess.run(
-        ["git", "rev-parse", "HEAD"],
-        cwd=REPO_ROOT,
-        capture_output=True,
-        text=True,
-    )
-    if result.returncode != 0:
-        raise RuntimeError("Failed to get git commit hash")
-    return result.stdout.strip()[:7]
 
 
 def cargo_env_for_target(target: str) -> dict[str, str]:
@@ -202,7 +192,7 @@ def configure_template_for_abi(stage_dir: Path, abi: str) -> None:
     print(f"Updated customize.sh supported ABI to {supported_arch}")
 
 
-def modify_module_prop(stage_dir: Path, version: str, git_count: str, git_hash: str) -> None:
+def modify_module_prop(stage_dir: Path, version: str, git_count: str) -> None:
     module_prop_path = stage_dir / "module.prop"
     if not module_prop_path.exists():
         raise FileNotFoundError(f"module.prop not found at {module_prop_path}")
@@ -278,7 +268,6 @@ def build_package_for_abi(
     platform: int,
     version: str,
     git_count: str,
-    git_hash: str,
 ) -> Path:
     target = ABI_TO_TARGET[abi]
     stage_dir = TARGET_ROOT / "temp" / abi
@@ -310,7 +299,7 @@ def build_package_for_abi(
                 stage_dir,
             )
 
-        modify_module_prop(stage_dir, version, git_count, git_hash)
+        modify_module_prop(stage_dir, version, git_count)
         normalize_module_text_files(stage_dir)
         generate_hash_files(stage_dir)
         return create_zip_package(
@@ -349,10 +338,9 @@ def main() -> None:
 
     version = get_version_from_cargo_toml()
     git_count = get_git_commit_count()
-    git_hash = get_git_commit_hash()
     selected_abis = args.abis or ["arm64-v8a"]
 
-    print(f"Building OhMyKeymint version {version} (commit {git_count}, hash {git_hash})")
+    print(f"Building OhMyKeymint version {version} (commit {git_count})")
     print(f"Build mode: {'Release' if args.release else 'Debug'}")
     print(f"Target ABIs: {', '.join(selected_abis)}")
 
@@ -366,7 +354,6 @@ def main() -> None:
                 platform=args.platform,
                 version=version,
                 git_count=git_count,
-                git_hash=git_hash,
             )
         )
 
