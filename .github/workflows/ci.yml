@@ -96,11 +96,9 @@ jobs:
       with:
         toolchain: nightly
         target: aarch64-linux-android
-    - name: Install sccache
-      run: |
-        curl -sL https://github.com/mozilla/sccache/releases/download/v0.8.2/sccache-v0.8.2-x86_64-unknown-linux-musl.tar.gz | tar xz
-        sudo mv sccache-v0.8.2-x86_64-unknown-linux-musl/sccache /usr/local/bin/
-        sccache --version
+        - name: Install sccache
+      uses: mozilla-actions/sccache-action@v0.0.6
+
     - name: Cache Cargo registry and build artifacts
       uses: actions/cache@v6
       with:
