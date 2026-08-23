@@ -114,9 +114,9 @@ jobs:
           VERSION_CODE=$(grep '^versionCode=' module.prop | cut -d= -f2)
           echo "Module version: $VERSION (versionCode: $VERSION_CODE)"
 
-          # Repackage without .sha256 hash files
+          # Repackage (include .sha256 hash files, required by verify.sh)
           ZIP_NAME="安卓设备隐藏bl-release-arm64-v8a-${VERSION}.zip"
-          zip -q -r "../$ZIP_NAME" . -x "*.sha256"
+          zip -q -r "../$ZIP_NAME" .
           cd ..
 
           echo "zip_name=$ZIP_NAME" >> "$GITHUB_OUTPUT"
