@@ -2,35 +2,33 @@
 
 [![Telegram](https://img.shields.io/static/v1?label=Telegram&message=@OhMyKeymint&color=0088cc)](https://t.me/OhMyKeymint)  [![CI Build](https://github.com/qwq233/OhMyKeymint/actions/workflows/ci.yml/badge.svg)](https://github.com/qwq233/OhMyKeymint/actions/workflows/ci.yml)
 
-Custom keystore implementation for Android Keystore Spoofer
+Android Keystore 伪造器的自定义密钥库实现
 
-## What is this?
+## 这是什么？
 
-This is a complete implementation of the keystore, which fully implements the AOSP AIDL interface, referencing the official AOSP implementation.
+这是一个完整的 keystore 实现，完全实现了 AOSP AIDL 接口，参考了官方 AOSP 实现。
 
-In theory, this would make it harder for detectors to identify behavior inconsistent with AOSP, thus achieving greater stealth than the FOSS branch of TrickyStore or other TrickyStore-based module like TEESimulator.
+从理论上讲，这会让检测程序更难识别出与 AOSP 不一致的行为，从而比 TrickyStore 的 FOSS 分支或其他基于 TrickyStore 的模块（如 TEESimulator）实现更好的隐蔽性。
 
-## Install and configure
+## 安装与配置
 
-**Android 12 or above required.**
+**需要 Android 12 或更高版本。**
 
-1. Install this module.
+1. 安装本模块。
+2. 如需要，[配置 OMK](docs/CONFIGURATION.md)。
+3. 替换模板 keybox.xml（如需要）
 
-2. [Configure OMK](docs/CONFIGURATION.md) if needed.
+keybox 文件必须是一个**有效的** XML 文件，同时包含 EC 和 RSA 链，这意味着文件中不能有任何额外内容，例如水印或不可见字符。
 
-3. Replace template keybox.xml (if you need)
+生效的配置文件位于 `/data/misc/keystore/omk/config.toml` 和
+`/data/misc/keystore/omk/injector.toml`。完整的注释示例、逐字段说明、安全注意事项以及重启要求，请阅读
+[配置指南](docs/CONFIGURATION.md)。
 
-The keybox file should be a **valid** XML file with both EC and RSA chain, which means there should be no extra content in it like watermark or invisible characters.
+## 重启 keymint 和 injector
 
-The active files are `/data/misc/keystore/omk/config.toml` and
-`/data/misc/keystore/omk/injector.toml`. Read the
-[Configuration Guide](docs/CONFIGURATION.md) for complete annotated examples,
-field-by-field explanations, safety notes, and restart requirements.
+本模块包含两个后台守护进程：一个用于 `keymint`，一个用于 `injector`。
 
-## Restarting keymint and injector
-
-The module ships two background daemons: one for `keymint`, one for `injector`.
-You can restart them by following commands.
+你可以通过以下命令重启它们：
 
 ```sh
 touch /data/adb/omk/restart.keymint
@@ -38,12 +36,12 @@ touch /data/adb/omk/restart.injector
 touch /data/adb/omk/restart.all
 ```
 
-See the [Configuration Guide](docs/CONFIGURATION.md#how-changes-are-loaded) for
-which changes need a component restart or a full device reboot.
+哪些更改需要重启组件或完全重启设备，请参见
+[配置指南](docs/CONFIGURATION.md#how-changes-are-loaded)。
 
-## License
+## 许可证
 
-**YOU MUST AGREE TO BOTH OF THE LICENSE BEFORE USING THIS SOFTWARE.**
+**使用本软件前，您必须同意以下两项许可证。**
 
 `AGPL-3.0-or-later`
 
@@ -71,24 +69,20 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 1. 您不得将本软件、本软件的任意部分或将本软件作为依赖的软件用于任何商业用途。该
    商业用途包括但不限于以盈利为目的，将本软件、本软件的任意部分或将本软件作为依
    赖的软件与其他资源、物品或服务捆绑销售。
-
 2. 您不得暗示或明示本软件与其他软件有任何从属关系。
-
 3. 未经本软件作者书面允许，您不得超出合理使用范围或协议许可范围使用本软件的名称。
-
 4. 除非您所在的司法管辖区的适用法律另行规定，您同意将纠纷或争议提交至中国大陆境
    内有管辖权的人民法院管辖。
-
 5. 本协议与GNU Affero General Public License（以下简称AGPL）共同发挥效力，
    当本协议内容与AGPL冲突时，应当优先应用本协议内容，本协议仅覆盖本软件作者拥有
    完全著作权的部分，对于使用其他协议的软件代码不发挥效力。
 ```
 
-## Credit
+## 致谢
 
-Some code from [AOSP](https://source.android.com/)
+部分代码来自 [AOSP](https://source.android.com/)
 
-License: `Apache-2.0`
+许可证：`Apache-2.0`
 
 ```plaintext
 Copyright 2022, The Android Open Source Project
