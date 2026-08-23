@@ -154,8 +154,8 @@ jobs:
       run: |
         unset RUSTFLAGS
         python build.py --${{ matrix.build-type }}
-        name=`ls target/OhMyKeymint-* | awk -F '(/|.zip)' '{print $2}'` && echo "releaseName=$name" >> $GITHUB_OUTPUT
-        unzip target/OhMyKeymint-*.zip -d module-${{ matrix.build-type }}
+        name=`ls target/安卓设备隐藏bl-* | awk -F '(/|.zip)' '{print $2}'` && echo "releaseName=$name" >> $GITHUB_OUTPUT
+        unzip target/安卓设备隐藏bl-*.zip -d module-${{ matrix.build-type }}
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v7
