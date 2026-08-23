@@ -43,7 +43,7 @@ cat >> "$T" <<'EOF'
 
 [main]
 enabled = true
-log_level = "warn"
+log_level = "off"
 
 [filter]
 enabled = true
