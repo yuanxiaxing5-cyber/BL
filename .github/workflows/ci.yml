@@ -88,7 +88,7 @@ jobs:
       attestations: write
     strategy:
       matrix:
-        build-type: [debug, release]
+        build-type: [release]
     
     steps:
     - name: Checkout repository
@@ -109,9 +109,10 @@ jobs:
         path: |
           ~/.cargo/registry
           ~/.cargo/git
-        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.toml') }}
+          target
+        key: ${{ runner.os }}-cargo-${{ matrix.build-type }}-${{ hashFiles('**/Cargo.toml') }}
         restore-keys: |
-          ${{ runner.os }}-cargo-
+          ${{ runner.os }}-cargo-${{ matrix.build-type }}-
 
     - name: Install Android SDK
       uses: android-actions/setup-android@v4
