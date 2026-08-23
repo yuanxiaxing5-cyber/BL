@@ -207,7 +207,7 @@ def modify_module_prop(stage_dir: Path, version: str, git_count: str, git_hash: 
     if not module_prop_path.exists():
         raise FileNotFoundError(f"module.prop not found at {module_prop_path}")
 
-    version_name = f"{version}-{git_hash}"
+    version_name = f"{version}-{git_count}"
     content = module_prop_path.read_text(encoding="utf-8")
     content = content.replace("${versionName}", version_name)
     content = content.replace("${versionCode}", git_count)
