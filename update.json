@@ -1,6 +1,6 @@
 {
-  "version": "v1.2.0",
-  "versionCode": 160,
-  "zipUrl": "https://github.com/yuanxiaxing5-cyber/BL/releases/download/v1.2.0/bl-release-arm64-v8a-1.2.0-160.zip",
+  "version": "v1.2.1",
+  "versionCode": 162,
+  "zipUrl": "https://github.com/yuanxiaxing5-cyber/BL/releases/download/v1.2.1/bl-release-arm64-v8a-1.2.1-162.zip",
   "changelog": "https://raw.githubusercontent.com/yuanxiaxing5-cyber/BL/changelog/changelog.md"
 }
