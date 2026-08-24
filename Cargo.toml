@@ -91,6 +91,3 @@ ciborium = "0.2.2"
 rcgen = "0.14.8"
 tempfile = "3.27.0"
 
-[profile.release]
-panic = "abort"
-
