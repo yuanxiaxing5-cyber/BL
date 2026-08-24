@@ -20,7 +20,7 @@ prost = "0.14.4"
 prost-types = "0.14.4"
 hex = "0.4.3"
 log4rs = "1.4.0"
-log = "0.4.33"
+log = { version = "0.4.33", features = ["release_max_level_off"] }
 rsbinder = { version = "0.10.0", features = ["android_12_plus", "rpc"] }
 rusqlite = { version = "0.40.1", features = ["bundled"] }
 anyhow = "1.0.104"
@@ -93,7 +93,4 @@ tempfile = "3.27.0"
 
 [profile.release]
 panic = "abort"
-
-[dependencies]
-log = { version = "*", features = ["release_max_level_off"] }
 
