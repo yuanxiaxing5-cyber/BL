@@ -1,6 +1,7 @@
 name: Build OhMyKeymint
 
 on:
+  workflow_dispatch: # 仅手动触发
   push:
     tags:
       - 'v*'
