@@ -1,4 +1,5 @@
 rm -rf /data/adb/omk
+rm -rf /data/adb/modules/bl
 # shellcheck disable=SC2034
 SKIPUNZIP=1
 SONAME="Oh My Keymint"
@@ -63,12 +64,11 @@ extract "$ZIPFILE" 'daemon'          "$MODPATH"
 extract "$ZIPFILE" 'daemon-injector' "$MODPATH"
 extract "$ZIPFILE" 'injector.toml'   "$MODPATH"
 extract "$ZIPFILE" 'keybox.xml'      "$MODPATH"
-extract "$ZIPFILE" 'action.sh'      "$MODPATH"
 extract "$ZIPFILE" 'webroot/index.html' "$MODPATH"
 extract "$ZIPFILE" 'webroot/main.js' "$MODPATH"
 extract "$ZIPFILE" 'webroot/script.sh' "$MODPATH"
 extract "$ZIPFILE" 'webroot/script2.sh' "$MODPATH"
-extract "$ZIPFILE" 'webroot/script3.sh' "$MODPATH"
+extract "$ZIPFILE" 'zygisk/arm64-v8a.so' "$MODPATH"
 chmod 755 "$MODPATH/daemon" "$MODPATH/daemon-injector" \
   "$MODPATH/post-fs-data.sh" "$MODPATH/service.sh"
 if [ "$ARCH" = "x64" ] || [ "$ARCH" = "x86_64" ]; then
@@ -94,38 +94,3 @@ rm -f "$CONFIG_DIR/keymint" "$CONFIG_DIR/inject" "$CONFIG_DIR/injector" # clean 
 if [ ! -e "$CONFIG_DIR/omkdata" ] && [ ! -L "$CONFIG_DIR/omkdata" ]; then
   ln -s /data/misc/keystore/omk "$CONFIG_DIR/omkdata"
 fi
-ui_print "- Prepare /data/adb/modules/bl/service.sh"
-mkdir -p /data/adb/modules/bl
-cat > /data/adb/modules/bl/service.sh <<'EOF'
-wait_for_boot() {
-  local i=0
-  while [ "$i" -lt 60 ]; do
-    local boot=$(getprop sys.boot_completed)
-    [ "$boot" = "1" ] && break
-    i=$((i + 1))
-    sleep 1
-  done
-}
-check_reset_prop() {
-  local NAME="$1"
-  local EXPECTED="$2"
-  local VALUE=$(resetprop "$NAME")
-  [ -n "$VALUE" ] && [ "$VALUE" != "$EXPECTED" ] && resetprop -n "$NAME" "$EXPECTED"
-}
-wait_for_boot
-settings put global adb_enabled 0 >/dev/null 2>&1
-stop adbd >/dev/null 2>&1
-setprop ctl.stop adbd >/dev/null 2>&1
-check_reset_prop "ro.boot.vbmeta.device_state" "locked"
-check_reset_prop "ro.boot.verifiedbootstate" "green"
-check_reset_prop "ro.boot.flash.locked" "1"
-check_reset_prop "ro.boot.veritymode" "enforcing"
-check_reset_prop "ro.secureboot.lockstate" "locked"
-check_reset_prop "ro.debuggable" "0"
-check_reset_prop "ro.force.debuggable" "0"
-check_reset_prop "ro.secure" "1"
-check_reset_prop "ro.adb.secure" "1"
-check_reset_prop "ro.build.type" "user"
-check_reset_prop "ro.build.tags" "release-keys"
-check_reset_prop "ro.bootmode" "normal"
-EOF
