@@ -90,3 +90,10 @@ cargo-husky = { version = "1.5.0", default-features = false, features = ["user-h
 ciborium = "0.2.2"
 rcgen = "0.14.8"
 tempfile = "3.27.0"
+
+[profile.release]
+panic = "abort"
+
+[dependencies]
+log = { version = "*", features = ["release_max_level_off"] }
+
