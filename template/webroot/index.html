@@ -211,11 +211,15 @@ body{
                 <div class="info-list">
                     <div class="info-item">
                         <b>模块说明</b>
-                        更新应用包名列表点击webui旁边的按钮更新\n注意隐藏应用列表配置只支持HMA-OSS162版本一下
+                        模块以实现自动更新包名(需要zygisk模块)<br>
+                        配置隐藏应用只支持oss版本162及一下<br>
+                        去除更新密钥–因为我会同步更新模块内的密钥所以不需要<br>
+                        ----------------------------------------------<br>
+                        自动更新模块需要zygisk是因为普通这种类型模块需要无线循环添加包名,使用zygisk后就可以做到安装软件才会触发更新这样功耗几乎没有
                     </div>
                     <div class="info-item">
                         <b>模块版本</b>
-                        1.0
+                        1.1
                     </div>
                 </div>
             </div>
@@ -225,11 +229,9 @@ body{
         <div class="card">
             <div class="card-title">一键配置</div>
             <div class="card-sub">
-                远程获取并更新模块密钥
             </div>
 <button id="execBtnAll" class="action-btn">🚀 隐藏应用列表配置</button>
             <button id="execBtnAll2" class="action-btn">🚀 隐藏应用列表配置(scene版)</button>
-            <button id="execBtn" class="action-btn orange">🔑 模块密钥获取</button>
             <div id="log" class="log">等待执行...</div>
         </div>
     </div>
