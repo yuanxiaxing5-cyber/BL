@@ -45,7 +45,6 @@ BINARY_SPECS = (
 )
 
 REQUIRED_TEMPLATE_FILES = (
-    "action.sh",
     "customize.sh",
     "daemon",
     "daemon-injector",
@@ -59,7 +58,6 @@ REQUIRED_TEMPLATE_FILES = (
 MODULE_TEXT_FILES = (
     "AOSP.Apache-license-2.0.txt",
     "README.md",
-    "action.sh",
     "customize.sh",
     "daemon",
     "daemon-injector",
