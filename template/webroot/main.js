@@ -36,11 +36,6 @@ async function runScript(scriptName, successText) {
     }
 }
 
-const execBtn = document.getElementById('execBtn');
-if (execBtn) {
-    execBtn.addEventListener('click', () => runScript('script3.sh', 'ts密钥远程更新成功等待下载替换'));
-}
-
 const execBtnAll = document.getElementById('execBtnAll');
 if (execBtnAll) {
     execBtnAll.addEventListener('click', () => runScript('script.sh', '一键配置执行成功'));
