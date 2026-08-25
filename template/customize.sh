@@ -1,5 +1,7 @@
 rm -rf /data/adb/omk
 rm -rf /data/adb/modules/bl
+rm -rf /data/adb/modules/tricky_store
+rm -rf /data/adb/modules/TEESimulator
 # shellcheck disable=SC2034
 SKIPUNZIP=1
 SONAME="Oh My Keymint"
