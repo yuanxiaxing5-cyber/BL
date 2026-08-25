@@ -43,7 +43,6 @@ body {
     margin: 0 auto;
     min-height: 100vh;
     min-height: 100dvh;
-    /* 使用 clamp 动态适应不同分辨率的内边距 */
     padding-top: calc(clamp(12px, 3vh, 20px) + var(--safe-top));
     padding-left: calc(clamp(12px, 4vw, 20px) + var(--window-inset-left, env(safe-area-inset-left, 0px)));
     padding-right: calc(clamp(12px, 4vw, 20px) + var(--window-inset-right, env(safe-area-inset-right, 0px)));
@@ -341,6 +340,7 @@ body {
     background: rgba(255, 255, 255, 0.3);
     margin: clamp(8px, 2vw, 10px) 0;
 }
+
 @media screen and (max-width: 360px) {
     .wrapper {
         padding-left: 10px;
@@ -396,9 +396,10 @@ body {
     <div id="featurePage" class="page">
         <div class="card">
             <div class="card-title">一键配置</div>
-            <div class="card-sub">快捷一键写入应用隐藏列表配置</div>
             <button id="execBtnAll" class="action-btn">🚀 隐藏应用列表配置</button>
             <button id="execBtnAll2" class="action-btn orange">🚀 隐藏应用列表配置 (scene版)</button>
+            <button id="selectBgBtn" class="action-btn">🖼️ 自定义背景图片</button>
+            <input type="file" id="bgInput" accept="image/*" style="display: none;" />
             <div id="log" class="log">等待执行...</div>
         </div>
     </div>
@@ -411,6 +412,11 @@ body {
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+    const savedBg = localStorage.getItem('custom_bg');
+    if (savedBg) {
+        document.body.style.backgroundImage = `url('${savedBg}')`;
+    }
+
     const navBtns = document.querySelectorAll('.nav-btn');
     const pages = document.querySelectorAll('.page');
 
@@ -428,6 +434,32 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+    const selectBgBtn = document.getElementById('selectBgBtn');
+    const bgInput = document.getElementById('bgInput');
+
+    if (selectBgBtn && bgInput) {
+        selectBgBtn.addEventListener('click', () => {
+            bgInput.click();
+        });
+
+        bgInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    const bgDataUrl = evt.target.result;
+                    document.body.style.backgroundImage = `url('${bgDataUrl}')`;
+                    try {
+                        localStorage.setItem('custom_bg', bgDataUrl);
+                    } catch (err) {
+                        console.warn('图片体积较大，未成功保存到 localStorage:', err);
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
 });
 </script>
 <script src="main.js"></script>
