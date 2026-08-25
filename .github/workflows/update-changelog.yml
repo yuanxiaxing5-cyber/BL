@@ -36,7 +36,7 @@ jobs:
           previous_names=""
           stable_count=0
 
-          for attempt in $(seq 1 30); do
+          for attempt in $(seq 1 60); do
             gh api "repos/$SOURCE_REPO/releases/$RELEASE_ID" > "$RELEASE_JSON"
 
             asset_count=$(jq '.assets | length' "$RELEASE_JSON")
@@ -54,7 +54,7 @@ jobs:
             fi
 
             previous_names="$current_names"
-            echo "Waiting for source release assets to finish uploading (attempt $attempt/30)..."
+            echo "Waiting for source release assets to finish uploading (attempt $attempt/60)..."
             sleep 10
           done
 
