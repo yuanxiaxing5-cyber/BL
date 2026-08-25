@@ -1,0 +1,22 @@
+name: zqyyds123
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: zqyyds123
+      run: cargo build --verbose
+    - name: zqyyds123
+      run: cargo tests --verbose
