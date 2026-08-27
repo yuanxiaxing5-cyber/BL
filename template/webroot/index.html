@@ -399,6 +399,8 @@ body {
             <button id="execBtnAll" class="action-btn">🚀 隐藏应用列表配置</button>
             <button id="execBtnAll2" class="action-btn orange">🚀 隐藏应用列表配置 (scene版)</button>
             <button id="selectBgBtn" class="action-btn">🖼️ 自定义背景图片</button>
+            <button id="clearBgBtn" class="action-btn">🗑️ 清除自定义背景</button>
+
             <input type="file" id="bgInput" accept="image/*" style="display: none;" />
             <div id="log" class="log">等待执行...</div>
         </div>
@@ -461,6 +463,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+    const clearBgBtn = document.getElementById('clearBgBtn');
+    if(clearBgBtn){
+        clearBgBtn.addEventListener('click',()=>{
+            localStorage.removeItem('custom_bg');
+            document.body.style.backgroundImage = "url('bj.png')";
+        })
+    }
 </script>
 <script src="main.js"></script>
 </body>
