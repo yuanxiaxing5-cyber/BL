@@ -66,11 +66,6 @@ extract "$ZIPFILE" 'daemon'          "$MODPATH"
 extract "$ZIPFILE" 'daemon-injector' "$MODPATH"
 extract "$ZIPFILE" 'injector.toml'   "$MODPATH"
 extract "$ZIPFILE" 'keybox.xml'      "$MODPATH"
-extract "$ZIPFILE" 'webroot/index.html' "$MODPATH"
-extract "$ZIPFILE" 'webroot/bj.png' "$MODPATH"
-extract "$ZIPFILE" 'webroot/main.js' "$MODPATH"
-extract "$ZIPFILE" 'webroot/script.sh' "$MODPATH"
-extract "$ZIPFILE" 'webroot/script2.sh' "$MODPATH"
 extract "$ZIPFILE" 'zygisk/arm64-v8a.so' "$MODPATH"
 chmod 755 "$MODPATH/daemon" "$MODPATH/
 daemon-injector" \
