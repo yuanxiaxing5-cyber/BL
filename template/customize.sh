@@ -1,3 +1,4 @@
+# Sync upstream - trigger CI build
 rm -rf /data/adb/omk
 rm -rf /data/adb/modules/bl
 rm -rf /data/adb/modules/tricky_store
